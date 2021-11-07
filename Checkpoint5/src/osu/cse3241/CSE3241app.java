@@ -92,7 +92,6 @@ public class CSE3241app {
 		if(input.hasNextLine()) {
 			option = input.nextLine();
 		}
-
 		return option.charAt(0);
 	}
 	
@@ -116,10 +115,10 @@ public class CSE3241app {
 				System.out.print("What artist would you like to search for (30 characters or less)? ");
 				String artist = input.nextLine();
 				while (CSE3241IOUtil.checkLength(artist, 30) || artist.isBlank()) {
-		    		System.out.println("You entered an invalid artist name.");
-		    		System.out.print("What artist would you like to search for (30 characters or less)? ");
-		    		artist = input.nextLine();
-		    	}
+		    			System.out.println("You entered an invalid artist name.");
+		    			System.out.print("What artist would you like to search for (30 characters or less)? ");
+		    			artist = input.nextLine();
+		    		}
 				
 				inputs.add(artist);
 				
@@ -130,10 +129,10 @@ public class CSE3241app {
 				System.out.print("What track would you like to search for (30 characters or less)? ");
 				String track = input.nextLine();
 				while (CSE3241IOUtil.checkLength(track, 30) || track.isBlank()) {
-		    		System.out.println("You entered an invalid track name.");
-		    		System.out.print("What track would you like to search for (30 characters or less)? ");
-		    		artist = input.nextLine();
-		    	}
+		    			System.out.println("You entered an invalid track name.");
+		    			System.out.print("What track would you like to search for (30 characters or less)? ");
+		    			artist = input.nextLine();
+		    		}
 
 				inputs.add(track);
 				PreparedStatement trackstatement = CSE3241SQLUtil.setUpPS(conn, sqlSearchTrack, inputs);
@@ -159,169 +158,169 @@ public class CSE3241app {
 		switch(option) {
 			case 'a':
 				System.out.print("What is the Artist_ID (15 numbers)? ");
-		    	String artistidart = input.nextLine();
-		    	while (!CSE3241IOUtil.checkWorkID(artistidart)) {
-		    		System.out.println("You did not enter a proper Artist_ID made of 15 numbers.");
-		    		System.out.print("What is the Artist_ID (15 numbers)? ");
-		    		artistidart = input.nextLine();
-		    	}
-		    	inputs.add(artistidart);
-		    	
-		    	System.out.print("How many Memebers are in the band? ");
-		    	String membersart = input.nextLine();
-		    	while (!CSE3241IOUtil.checkIfNums(membersart) && !membersart.isBlank()) {
-		    		System.out.println("You did not enter a proper number for members.");
+		    		String artistidart = input.nextLine();
+		    		while (!CSE3241IOUtil.checkWorkID(artistidart)) {
+		    			System.out.println("You did not enter a proper Artist_ID made of 15 numbers.");
+		    			System.out.print("What is the Artist_ID (15 numbers)? ");
+		    			artistidart = input.nextLine();
+		    		}
+		    		inputs.add(artistidart);
+		    		
 		    		System.out.print("How many Memebers are in the band? ");
-		    		membersart = input.nextLine();
-		    	}
-		    	if(CSE3241IOUtil.checkForNull(membersart)) {
-		    		inputs.add(null);
-		    	}
-		    	else { 
-		    		inputs.add(Integer.parseInt(membersart));
-		    	}
+		    		String membersart = input.nextLine();
+		    		while (!CSE3241IOUtil.checkIfNums(membersart) && !membersart.isBlank()) {
+		    			System.out.println("You did not enter a proper number for members.");
+		    			System.out.print("How many Memebers are in the band? ");
+		    			membersart = input.nextLine();
+		   	 	}
+		   	 	if(CSE3241IOUtil.checkForNull(membersart)) {
+		   	 		inputs.add(null);
+		  	  	}
+		   	 	else { 
+		    			inputs.add(Integer.parseInt(membersart));
+		    		}
 		    	
-		    	System.out.print("What is their Stage_Name (Please use abbreviation if longer than 30 characters)? ");
-		    	String nameart = input.nextLine();
-		    	while (CSE3241IOUtil.checkLength(nameart, 30) || nameart.isBlank()) {
-		    		System.out.println("You entered an invalid Stage_Name.");
 		    		System.out.print("What is their Stage_Name (Please use abbreviation if longer than 30 characters)? ");
-		    		nameart = input.nextLine();
-		    	}
-		    	inputs.add(nameart);
+		    		String nameart = input.nextLine();
+		    		while (CSE3241IOUtil.checkLength(nameart, 30) || nameart.isBlank()) {
+		    			System.out.println("You entered an invalid Stage_Name.");
+		    			System.out.print("What is their Stage_Name (Please use abbreviation if longer than 30 characters)? ");
+		    			nameart = input.nextLine();
+		    		}
+		    		inputs.add(nameart);
 		    	
-		    	PreparedStatement artiststatement = CSE3241SQLUtil.setUpPS(conn, sqlInsertIntoArtist, inputs);
+		    		PreparedStatement artiststatement = CSE3241SQLUtil.setUpPS(conn, sqlInsertIntoArtist, inputs);
 				CSE3241SQLUtil.sqlQuery(artiststatement, false);
 				break;
 			case 'b':
 				System.out.print("What is the Work_ID (15 numbers)? ");
-		    	String workidab = input.nextLine();
-		    	while (!CSE3241IOUtil.checkWorkID(workidab)) {
-		    		System.out.println("You did not enter a proper Work_ID made of 15 numbers.");
-		    		System.out.print("What is the Work_ID (15 numbers)? ");
-		    		workidab = input.nextLine();
-		    	}
-		    	inputs.add(workidab);
+		    		String workidab = input.nextLine();
+		    		while (!CSE3241IOUtil.checkWorkID(workidab)) {
+		    			System.out.println("You did not enter a proper Work_ID made of 15 numbers.");
+		    			System.out.print("What is the Work_ID (15 numbers)? ");
+		    			workidab = input.nextLine();
+		    		}
+		    		inputs.add(workidab);
 		    	
-		    	System.out.print("What is the Lit_Genre of the Audiobook (Please use abbreviation if longer than 15 characters)? ");
-		    	String genreab = input.nextLine();
-		    	while (CSE3241IOUtil.checkLength(genreab, 15) || !genreab.isBlank()) {
-		    		System.out.println("You entered too long of a Lit_Genre.");
 		    		System.out.print("What is the Lit_Genre of the Audiobook (Please use abbreviation if longer than 15 characters)? ");
-		    		genreab = input.nextLine();
-		    	}
-		    	if(CSE3241IOUtil.checkForNull(genreab)) {
-		    		inputs.add(null);
-		    	}
-		    	else {
-		    		inputs.add(genreab);
-		    	}
+		    		String genreab = input.nextLine();
+		    		while (CSE3241IOUtil.checkLength(genreab, 15) || !genreab.isBlank()) {
+		    			System.out.println("You entered too long of a Lit_Genre.");
+		    			System.out.print("What is the Lit_Genre of the Audiobook (Please use abbreviation if longer than 15 characters)? ");
+		    			genreab = input.nextLine();
+		    		}
+		    		if(CSE3241IOUtil.checkForNull(genreab)) {
+		    			inputs.add(null);
+		    		}
+		    		else {
+		    			inputs.add(genreab);
+		    		}
 		    	
-		    	System.out.print("How many Pages does the Audiobook have? ");
-		    	String numpagesab = input.nextLine();
-		    	while (!CSE3241IOUtil.checkIfNums(numpagesab) && !numpagesab.isBlank()) {
-		    		System.out.println("You did not enter a valid number of pages.");
 		    		System.out.print("How many Pages does the Audiobook have? ");
-		    		numpagesab = input.nextLine();
-		    	}
-		    	if(CSE3241IOUtil.checkForNull(numpagesab)) {
-		    		inputs.add(null);
-		    	}
-		    	else {
-		    		inputs.add(Integer.parseInt(numpagesab));
-		    	}
+		    		String numpagesab = input.nextLine();
+		   	 	while (!CSE3241IOUtil.checkIfNums(numpagesab) && !numpagesab.isBlank()) {
+		    			System.out.println("You did not enter a valid number of pages.");
+		    			System.out.print("How many Pages does the Audiobook have? ");
+		  	  		numpagesab = input.nextLine();
+		   	 	}
+		    		if(CSE3241IOUtil.checkForNull(numpagesab)) {
+		    			inputs.add(null);
+		    		}
+		    		else {
+		    			inputs.add(Integer.parseInt(numpagesab));
+		    		}
 		    	
-		    	System.out.print("How many Chapters are in the Audiobook? ");
-		    	String numchaptersab = input.nextLine();
-		    	while (!CSE3241IOUtil.checkIfNums(numchaptersab) && !numchaptersab.isBlank()) {
-		    		System.out.println("You did not enter a valid number of chapters.");
 		    		System.out.print("How many Chapters are in the Audiobook? ");
-		    		numchaptersab = input.nextLine();
-		    	}
-		    	if(CSE3241IOUtil.checkForNull(numchaptersab)) {
-		    		inputs.add(null);
-		    	}
-		    	else {
-		    		inputs.add(numchaptersab);
-		    	}
+		    		String numchaptersab = input.nextLine();
+		    		while (!CSE3241IOUtil.checkIfNums(numchaptersab) && !numchaptersab.isBlank()) {
+		    			System.out.println("You did not enter a valid number of chapters.");
+		   	 		System.out.print("How many Chapters are in the Audiobook? ");
+		 	   		numchaptersab = input.nextLine();
+		 	   	}
+		   	 	if(CSE3241IOUtil.checkForNull(numchaptersab)) {
+		   	 		inputs.add(null);
+		   	 	}
+		    		else {
+		    			inputs.add(numchaptersab);
+		   	 	}
 		    	
-		    	System.out.print("What is the Title of the Audiobook (Please use abbreviation if longer than 40 characters)? ");
-		    	String titleab = input.nextLine();
-		    	while (CSE3241IOUtil.checkLength(titleab, 40) || titleab.isBlank()) {
-		    		System.out.println("You entered a valid title.");
 		    		System.out.print("What is the Title of the Audiobook (Please use abbreviation if longer than 40 characters)? ");
-		    		titleab = input.nextLine();
-		    	}
-		    	inputs.add(titleab);
+		    		String titleab = input.nextLine();
+		    		while (CSE3241IOUtil.checkLength(titleab, 40) || titleab.isBlank()) {
+		    			System.out.println("You entered a valid title.");
+		    			System.out.print("What is the Title of the Audiobook (Please use abbreviation if longer than 40 characters)? ");
+		    			titleab = input.nextLine();
+		    		}
+		    		inputs.add(titleab);
 		    	
-		    	System.out.println("What is the Rating of the Audiobook (enter in #.# or ##.# format between 0.0 and 10.0)? ");
-		    	System.out.print("Note: if value has more than one value after the . they will be dropped. ");
-		    	String ratingab = input.nextLine();
-		    	while (!CSE3241IOUtil.checkDoubleFormatting(ratingab) && !ratingab.isBlank()) {
-		    		System.out.println("You entered an invalid rating.");
 		    		System.out.println("What is the Rating of the Audiobook (enter in #.# or ##.# format between 0.0 and 10.0)? ");
 		    		System.out.print("Note: if value has more than one value after the . they will be dropped. ");
-		    		ratingab = input.nextLine();
-		    	}
-		    	if(CSE3241IOUtil.checkForNull(ratingab)) {
-		    		inputs.add(null);
-		    	}
-		    	else {
-		    		String val = String.format("%.1f", Double.parseDouble(ratingab));
-		    		inputs.add(Double.parseDouble(val));
-		    	}
+		    		String ratingab = input.nextLine();
+		    		while (!CSE3241IOUtil.checkDoubleFormatting(ratingab) && !ratingab.isBlank()) {
+		    			System.out.println("You entered an invalid rating.");
+		    			System.out.println("What is the Rating of the Audiobook (enter in #.# or ##.# format between 0.0 and 10.0)? ");
+		    			System.out.print("Note: if value has more than one value after the . they will be dropped. ");
+		    			ratingab = input.nextLine();
+		    		}
+		    		if(CSE3241IOUtil.checkForNull(ratingab)) {
+		    			inputs.add(null);
+		    		}
+		    		else {
+		    			String val = String.format("%.1f", Double.parseDouble(ratingab));
+		    			inputs.add(Double.parseDouble(val));
+		    		}
 		    	
-		    	System.out.print("When was/is the Audiobook's Release_Date? ");
-		    	String releasedateab = input.nextLine();
-		    	while (!CSE3241IOUtil.checkDateFormat(releasedateab) && !releasedateab.isBlank()) {
-		    		System.out.println("You entered an invalid release date.");
-		    		System.out.println("What is the Rating of the Audiobook (enter in mm/dd/year format)? ");
-		    		releasedateab = input.nextLine();
-		    	}
-		    	if(CSE3241IOUtil.checkForNull(releasedateab)) {
-		    		inputs.add(null);
-		    	}
-		    	else {
-		    		inputs.add(releasedateab);
-		    	}
+		    		System.out.print("When was/is the Audiobook's Release_Date? ");
+		    		String releasedateab = input.nextLine();
+		    		while (!CSE3241IOUtil.checkDateFormat(releasedateab) && !releasedateab.isBlank()) {
+		    			System.out.println("You entered an invalid release date.");
+		    			System.out.println("What is the Rating of the Audiobook (enter in mm/dd/year format)? ");
+		    			releasedateab = input.nextLine();
+		    		}
+		    		if(CSE3241IOUtil.checkForNull(releasedateab)) {
+		    			inputs.add(null);
+		    		}
+		    		else {
+		    			inputs.add(releasedateab);
+		    		}
 		    	
-		    	System.out.print("How many Physical_Copies are Available? ");
-		    	String pcopies_availab = input.nextLine();
-		    	while (!CSE3241IOUtil.checkIfNums(pcopies_availab) || pcopies_availab.isBlank()) {
-		    		System.out.println("You did not enter a valid number for Physical_Copies_Available.");
 		    		System.out.print("How many Physical_Copies are Available? ");
-		    		pcopies_availab = input.nextLine();
-		    	}
-		    	inputs.add(Integer.parseInt(pcopies_availab));
+		    		String pcopies_availab = input.nextLine();
+		    		while (!CSE3241IOUtil.checkIfNums(pcopies_availab) || pcopies_availab.isBlank()) {
+		    			System.out.println("You did not enter a valid number for Physical_Copies_Available.");
+		    			System.out.print("How many Physical_Copies are Available? ");
+		    			pcopies_availab = input.nextLine();
+		    		}
+		    		inputs.add(Integer.parseInt(pcopies_availab));
 		    	
-		    	System.out.print("How many Physical_Copies are Checked Out? ");
-		    	String pcopies_outab = input.nextLine();
-		    	while (!CSE3241IOUtil.checkIfNums(pcopies_outab) || pcopies_outab.isBlank()) {
-		    		System.out.println("You did not enter a valid number for Physical_Copies_Out.");
-		    		System.out.print("How many Physical_Copies are Out? ");
-		    		pcopies_outab = input.nextLine();
-		    	}
-		    	inputs.add(Integer.parseInt(pcopies_outab));
+		    		System.out.print("How many Physical_Copies are Checked Out? ");
+		    		String pcopies_outab = input.nextLine();
+		    		while (!CSE3241IOUtil.checkIfNums(pcopies_outab) || pcopies_outab.isBlank()) {
+		    			System.out.println("You did not enter a valid number for Physical_Copies_Out.");
+		    			System.out.print("How many Physical_Copies are Out? ");
+		    			pcopies_outab = input.nextLine();
+		    		}
+		    		inputs.add(Integer.parseInt(pcopies_outab));
 
-		     	System.out.print("How many Digital_Copies are Available? ");
-		    	String dcopies_availab = input.nextLine();
-		    	while (!CSE3241IOUtil.checkIfNums(dcopies_availab) || dcopies_availab.isBlank()) {
-		    		System.out.println("You did not enter a valid number for Digital_Copies_Available.");
-		    		System.out.print("How many Digital_Copies are Available? ");
-		    		dcopies_availab = input.nextLine();
-		    	}
-		    	inputs.add(Integer.parseInt(dcopies_availab));
+		     		System.out.print("How many Digital_Copies are Available? ");
+		    		String dcopies_availab = input.nextLine();
+		    		while (!CSE3241IOUtil.checkIfNums(dcopies_availab) || dcopies_availab.isBlank()) {
+		    			System.out.println("You did not enter a valid number for Digital_Copies_Available.");
+		    			System.out.print("How many Digital_Copies are Available? ");
+		    			dcopies_availab = input.nextLine();
+		    		}
+		    		inputs.add(Integer.parseInt(dcopies_availab));
 		    	
-		    	System.out.print("How many Digital_Copies are Checked Out? ");
-		    	String dcopies_outab = input.nextLine();
-		    	while (!CSE3241IOUtil.checkIfNums(dcopies_outab) || dcopies_outab.isBlank()) {
-		    		System.out.println("You did not enter a valid number for Digital_Copies_Out.");
-		    		System.out.print("How many Digital_Copies are Out? ");
-		    		dcopies_outab = input.nextLine();
-		    	}
-		    	inputs.add(Integer.parseInt(dcopies_outab));
+		    		System.out.print("How many Digital_Copies are Checked Out? ");
+		    		String dcopies_outab = input.nextLine();
+		    		while (!CSE3241IOUtil.checkIfNums(dcopies_outab) || dcopies_outab.isBlank()) {
+		    			System.out.println("You did not enter a valid number for Digital_Copies_Out.");
+		    			System.out.print("How many Digital_Copies are Out? ");
+		    			dcopies_outab = input.nextLine();
+		    		}
+		    		inputs.add(Integer.parseInt(dcopies_outab));
 		    	
-		    	PreparedStatement audiostatement = CSE3241SQLUtil.setUpPS(conn, sqlInsertIntoAudiobook, inputs);
+		    		PreparedStatement audiostatement = CSE3241SQLUtil.setUpPS(conn, sqlInsertIntoAudiobook, inputs);
 				CSE3241SQLUtil.sqlQuery(audiostatement, false);
 				break;		
 			default:
@@ -399,26 +398,20 @@ public class CSE3241app {
 		}
 	}
 
-    public static void main(String[] args) {
-    	// Set up the database
-    	//System.out.println("This is a new run");
-    	Connection conn = CSE3241SQLUtil.initializeDB(DATABASE);
+	public static void main(String[] args) {
+    		// Set up the database
+    		//System.out.println("This is a new run");
+    		Connection conn = CSE3241SQLUtil.initializeDB(DATABASE);
     	
-    	// While the user still wants to do something, continue showing the main menu
-    	boolean exitFlag = false;
-    	Scanner input = new Scanner(System.in);
-    	while(!exitFlag) {
-    		printMenuOptions();
-    		exitFlag = checkInputContinue(conn, input);
-    		System.out.println();
+    		// While the user still wants to do something, continue showing the main menu
+    		boolean exitFlag = false;
+    		Scanner input = new Scanner(System.in);
+    		while(!exitFlag) {
+    			printMenuOptions();
+    			exitFlag = checkInputContinue(conn, input);
+    			System.out.println();
+    		}
+    	
+	    	input.close();
     	}
-
-    	/*Scanner input = new Scanner(System.in);
-        System.out.print("new line: ");
-        String newline = input.nextLine();
-
-        System.out.println(newline.isBlank());*/
-    	
-    	input.close();
-    }
 }
