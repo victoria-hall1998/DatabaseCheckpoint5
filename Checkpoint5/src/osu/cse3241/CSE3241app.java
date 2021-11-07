@@ -32,109 +32,22 @@ public class CSE3241app {
 	 *  Remember to include the semicolon at the end of the statement string.
 	 *  (Not all programming languages and/or packages require the semicolon (e.g., Python's SQLite3 library))
 	 */
-	private static String sqlSearchArtist = "SELECT * FROM Artist WHERE Stage_Name LIKE ?;";
-	private static String sqlSearchTrack = "SELECT * FROM Track WHERE Track_Title LIKE ?;";
+	// If there is an artist without any albums, it will still give the artist's info
+	private static String sqlSearchArtist = "SELECT Artist.Stage_Name, Artist.Artist_ID, Album.Title, Album.Work_ID, Track.Track_Title, Album.Physical_Copies_Available, Album.Digital_Copies_Available"
+			+ " FROM Artist"
+			+ " LEFT JOIN Produces"
+			+ " ON Artist.Artist_ID = Produces.Artist_ID"
+			+ " LEFT JOIN Album"
+			+ " ON Produces.Work_ID = Album.Work_ID"
+			+ " LEFT JOIN Track"
+			+ " ON Track.Work_ID = Album.Work_ID"
+			+ " WHERE Artist.Stage_Name LIKE ?;";
+	// If there is no track, then there is no info because track is a weak entity
+	private static String sqlSearchTrack = "SELECT Track.Track_Title, Track.Rating, Track.Duration, Album.Work_ID, Album.Music_Genre, Artist.Artist_ID, Artist.Stage_Name"
+			+ " FROM Track, Album, Produces, Artist"
+			+ " WHERE Track_Title LIKE ? AND Track.Work_ID = Album.Work_ID AND Album.Work_ID = Produces.Work_ID AND Produces.Artist_ID = Artist.Artist_ID;";
 	private static String sqlInsertIntoArtist = "INSERT INTO Artist(Artist_ID, No_Members, Stage_Name) VALUES (?, ?, ?);";
 	private static String sqlInsertIntoAudiobook = "INSERT INTO Audiobook(Work_ID, Lit_Genre, No_Pages, No_Chapters, Title, Rating, Release_Date, Physical_Copies_Available, Physical_Copies_Out, Digital_Copies_Available, Digital_Copies_Out) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-
-	
-    /**
-     * Connects to the database if it exists, creates it if it does not, and returns the connection object.
-     * 
-     * @param databaseFileName the database file name
-     * @return a connection object to the designated database
-     */
-    public static Connection initializeDB(String databaseFileName) {
-    	/**
-    	 * The "Connection String" or "Connection URL".
-    	 * 
-    	 * "jdbc:sqlite:" is the "subprotocol".
-    	 * (If this were a SQL Server database it would be "jdbc:sqlserver:".)
-    	 */
-        String url = "jdbc:sqlite:" + databaseFileName;
-        Connection conn = null; // If you create this variable inside the Try block it will be out of scope
-        try {
-            conn = DriverManager.getConnection(url);
-            if (conn != null) {
-            	// Provides some positive assurance the connection and/or creation was successful.
-                DatabaseMetaData meta = conn.getMetaData();
-                System.out.println("The driver name is " + meta.getDriverName());
-                System.out.println("The connection to the database was successful.");
-            } else {
-            	// Provides some feedback in case the connection failed but did not throw an exception.
-            	System.out.println("Null Connection");
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.out.println("There was a problem connecting to the database.");
-        }
-        return conn;
-    }
-    
-    /**
-     * Queries the database and prints the results.
-     * 
-     * @param conn a connection object
-     * @param sql a SQL statement that returns rows
-     * This query is written with the Statement class, typically 
-     * used for static SQL SELECT statements
-     */
-    public static void sqlQuery(Connection conn, String sql){
-        try {
-        	Statement stmt = conn.createStatement();
-        	ResultSet rs = stmt.executeQuery(sql);
-        	ResultSetMetaData rsmd = rs.getMetaData();
-        	int columnCount = rsmd.getColumnCount();
-        	for (int i = 1; i <= columnCount; i++) {
-        		String value = rsmd.getColumnName(i);
-        		System.out.print(value);
-        		if (i < columnCount) System.out.print(",  ");
-        	}
-			System.out.print("\n");
-        	while (rs.next()) {
-        		for (int i = 1; i <= columnCount; i++) {
-        			String columnValue = rs.getString(i);
-            		System.out.print(columnValue);
-            		if (i < columnCount) System.out.print(",  ");
-        		}
-    			System.out.print("\n");
-        	}
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-    
-    /**
-     * Queries the database and prints the results when the user gives an input.
-     * 
-     * @param conn a connection object
-     * @param sql a SQL statement that returns rows
-     * This query is written with the Statement class, typically 
-     * used for static SQL SELECT statements
-     */
-    public static void sqlQuerySearch(Connection conn, PreparedStatement ps){
-        try {
-        	ResultSet rs = ps.executeQuery();
-        	ResultSetMetaData rsmd = rs.getMetaData();
-        	int columnCount = rsmd.getColumnCount();
-        	for (int i = 1; i <= columnCount; i++) {
-        		String value = rsmd.getColumnName(i);
-        		System.out.print(value);
-        		if (i < columnCount) System.out.print(",  ");
-        	}
-			System.out.print("\n");
-        	while (rs.next()) {
-        		for (int i = 1; i <= columnCount; i++) {
-        			String columnValue = rs.getString(i);
-            		System.out.print(columnValue);
-            		if (i < columnCount) System.out.print(",  ");
-        		}
-    			System.out.print("\n");
-        	}
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
     
 	/**
 	 * Main Menu Options Print
@@ -202,39 +115,38 @@ public class CSE3241app {
 		 * search through VALUE attributes for the stagename or tracktitle
 		 * display all the info
 		 */
-		//boolean found = false;
+		ArrayList<Object> inputs = new ArrayList<Object>();
 		System.out.println("Select what you would like to search for:");
 		System.out.println("a. Artist");
 		System.out.println("b. Track");
 		char option = optionSelected(input);
 		switch(option) {
 			case 'a':
-				System.out.print("What artist would you like to search for? ");
+				System.out.print("What artist would you like to search for (30 characters or less)? ");
 				String artist = input.nextLine();
+				while (CSE3241IOUtil.checkLength(artist, 30) || artist.isBlank()) {
+		    		System.out.println("You entered an invalid artist name.");
+		    		System.out.print("What artist would you like to search for (30 characters or less)? ");
+		    		artist = input.nextLine();
+		    	}
 				
-	        	try {
-	        		PreparedStatement artistps;
-	        		artistps = conn.prepareStatement(sqlSearchArtist);
-		        	artistps.setString(1, artist);
-					sqlQuerySearch(conn, artistps);
-	        	} catch (SQLException e) {
-	        		System.out.println(e.getMessage());
-	        		e.printStackTrace();
-	        	}
+				inputs.add(artist);
+				
+				PreparedStatement artiststatement = CSE3241SQLUtil.setUpPS(conn, sqlSearchArtist, inputs);
+				CSE3241SQLUtil.sqlQuerySearchAndPrint(artiststatement);
 				break;
 			case 'b':
-				System.out.print("What track would you like to search for? ");
+				System.out.print("What track would you like to search for (30 characters or less)? ");
 				String track = input.nextLine();
-				
-				try {
-					PreparedStatement trackps;
-					trackps = conn.prepareStatement(sqlSearchTrack);
-					trackps.setString(1, track);
-					sqlQuerySearch(conn, trackps);
-				} catch (SQLException e) {
-					System.out.println(e.getMessage());
-					e.printStackTrace();
-				}
+				while (CSE3241IOUtil.checkLength(track, 30) || track.isBlank()) {
+		    		System.out.println("You entered an invalid track name.");
+		    		System.out.print("What track would you like to search for (30 characters or less)? ");
+		    		artist = input.nextLine();
+		    	}
+
+				inputs.add(track);
+				PreparedStatement trackstatement = CSE3241SQLUtil.setUpPS(conn, sqlSearchTrack, inputs);
+				CSE3241SQLUtil.sqlQuerySearchAndPrint(trackstatement);
 				break;
 			default:
 				// IF the user does not select a or b, then give an error
@@ -247,7 +159,7 @@ public class CSE3241app {
 	 * User selected b. Add new records as their option from Main Menu
 	 */
 	public static void addNewRecordOption(Connection conn, Scanner input) {
-		// Ask if the user wants to add an artist or a track
+		// Ask if the user wants to add an artist or an audiobook
 		System.out.println("Select what you would like to new record for:");
 		System.out.println("a. Artist");
 		System.out.println("b. Audiobook");
@@ -256,14 +168,25 @@ public class CSE3241app {
 			case 'a':
 				System.out.print("What is the Artist_ID (15 numbers)? ");
 		    	String artistidart = input.nextLine();
+		    	while (!CSE3241IOUtil.checkWorkID(artistidart)) {
+		    		System.out.println("You did not enter a proper Artist_ID made of 15 numbers.");
+		    		System.out.print("What is the Artist_ID (15 numbers)? ");
+		    		artistidart = input.nextLine();
+		    	}
 		    	
 		    	System.out.print("How many Memebers are in the band? ");
 		    	String membersart = input.nextLine();
+		    	boolean membersartNull = CSE3241IOUtil.checkForNull(membersart);
 		    	
-		    	System.out.print("What is their Stage_Name? ");
+		    	System.out.print("What is their Stage_Name (Please use abbreviation if longer than 30 characters)? ");
 		    	String nameart = input.nextLine();
+		    	while (CSE3241IOUtil.checkLength(nameart, 30) || nameart.isBlank()) {
+		    		System.out.println("You entered too long of a Stage_Name.");
+		    		System.out.print("What is their Stage_Name (Please use abbreviation if longer than 30 characters)? ");
+		    		nameart = input.nextLine();
+		    	}
 		    	
-	        	try {
+	        	/*try {
 	        		PreparedStatement artistps;
 	        		artistps = conn.prepareStatement(sqlInsertIntoArtist);
 	        		artistps.setString(1, artistidart);
@@ -273,23 +196,36 @@ public class CSE3241app {
 	        	} catch (SQLException e) {
 	        		System.out.println(e.getMessage());
 	        		e.printStackTrace();
-	        	}
+	        	}*/
 				break;
 			case 'b':
 				System.out.print("What is the Work_ID (15 numbers)? ");
 		    	String workidab = input.nextLine();
+		    	while (!CSE3241IOUtil.checkWorkID(workidab)) {
+		    		System.out.println("You did not enter a proper Work_ID made of 15 numbers.");
+		    		System.out.print("What is the Work_ID (15 numbers)? ");
+		    		workidab = input.nextLine();
+		    	}
 		    	
 		    	System.out.print("What is the Lit_Genre of the Album? ");
 		    	String genreab = input.nextLine();
+		    	boolean genreabNull = CSE3241IOUtil.checkForNull(genreab);
 		    	
 		    	System.out.print("How many Pages does the Audiobook have? ");
 		    	String numpagesab = input.nextLine();
+		    	boolean numpagesabNull = CSE3241IOUtil.checkForNull(numpagesab);
 		    	
 		    	System.out.print("How many Chapters are in the Audiobook? ");
 		    	String numchaptersab = input.nextLine();
+		    	boolean numchaptersabNull = CSE3241IOUtil.checkForNull(numchaptersab);
 		    	
-		    	System.out.print("What is the Title of the Audiobook? ");
+		    	System.out.print("What is the Title of the Audiobook (Please use abbreviation if longer than 40 characters)? ");
 		    	String titleab = input.nextLine();
+		    	while (CSE3241IOUtil.checkLength(titleab, 40) || titleab.isBlank()) {
+		    		System.out.println("You entered too long of a title.");
+		    		System.out.print("What is the Title of the Audiobook (Please use abbreviation if longer than 40 characters)? ");
+		    		titleab = input.nextLine();
+		    	}
 		    	
 		    	System.out.print("What is the Rating of the Audiobook? ");
 		    	String ratingab = input.nextLine();
@@ -309,7 +245,7 @@ public class CSE3241app {
 		    	System.out.print("How many Digital_Copies are Checked Out? ");
 		    	String dcopies_outab = input.nextLine();
 		    	
-	        	try {
+	        	/*try {
 	        		PreparedStatement audiobookps;
 	        		audiobookps = conn.prepareStatement(sqlInsertIntoAudiobook);
 	        		audiobookps.setString(1, workidab);
@@ -328,7 +264,7 @@ public class CSE3241app {
 	        	} catch (SQLException e) {
 	        		System.out.println(e.getMessage());
 	        		e.printStackTrace();
-	        	}
+	        	}*/
 				break;		
 			default:
 				// IF the user entered something other than 1 or 2, give an error
@@ -467,7 +403,7 @@ public class CSE3241app {
     public static void main(String[] args) {
     	// Set up the database
     	//System.out.println("This is a new run");
-    	Connection conn = initializeDB(DATABASE);
+    	Connection conn = CSE3241SQLUtil.initializeDB(DATABASE);
     	
     	// While the user still wants to do something, continue showing the main menu
     	boolean exitFlag = false;
@@ -478,6 +414,12 @@ public class CSE3241app {
     		System.out.println();
     	}
 
+    	/*Scanner input = new Scanner(System.in);
+        System.out.print("new line: ");
+        String newline = input.nextLine();
+
+        System.out.println(newline.isBlank());*/
+    	
     	input.close();
     }
 }
