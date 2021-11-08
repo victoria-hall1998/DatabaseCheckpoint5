@@ -38,6 +38,16 @@ public class CSE3241app {
             + " WHERE Track_Title LIKE ? AND Track.Work_ID = Album.Work_ID AND Album.Work_ID = Produces.Work_ID AND Produces.Artist_ID = Artist.Artist_ID;";
     private static String sqlInsertIntoArtist = "INSERT INTO Artist(Artist_ID, No_Members, Stage_Name) VALUES (?, ?, ?);";
     private static String sqlInsertIntoAudiobook = "INSERT INTO Audiobook(Work_ID, Lit_Genre, No_Pages, No_Chapters, Title, Rating, Release_Date, Physical_Copies_Available, Physical_Copies_Out, Digital_Copies_Available, Digital_Copies_Out) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    private static String mostPopularActor = "SELECT max(total), Person.Name\r\n"
+            + "FROM PERSON, (SELECT count(Rents.Work_ID = Acts_In.Work_ID) as total\r\n"
+            + "FROM PERSON, RENTS, ACTS_IN\r\n"
+            + "WHERE Rents.Work_ID = ACTS_IN.Work_ID AND ACTS_IN.Personal_ID = Person.Personal_ID AND Rents.Type = \"Movie\")\r\n"
+            + "WHERE Person.Actor_Flag = \"TRUE\";\r\n" + "";
+    private static String mostPopularArtist = "SELECT max(time) , Artist.Stage_Name\r\n"
+            + "FROM Artist, (SELECT count(Rents.Work_ID * Album.Play_Time) as time\r\n"
+            + "FROM ARTIST, ALBUM, RENTS, PRODUCES\r\n"
+            + "WHERE Artist.Artist_ID = Produces.Artist_ID AND Rents.Work_ID = Produces.Work_ID);\r\n"
+            + "";
 
     /**
      * Main Menu Options Print
@@ -74,7 +84,7 @@ public class CSE3241app {
                 editRecordsOption(conn, input);
                 break;
             case 'e':
-                usefulReportsOption(input);
+                usefulReportsOption(conn, input);
                 break;
             default:
                 System.out.println("Exiting the Program");
@@ -450,7 +460,7 @@ public class CSE3241app {
     /**
      * User selected e. Useful reports as their option from Main Menu
      */
-    public static void usefulReportsOption(Scanner input) {
+    public static void usefulReportsOption(Connection conn, Scanner input) {
         System.out.println("Which option would you like to choose?");
         System.out.println("a. Tracks by ARTIST released before YEAR");
         System.out
@@ -460,6 +470,7 @@ public class CSE3241app {
         System.out.println("e. Patron who has checked out the most videos");
         System.out.println("Any other entry will exit the program");
         char option = optionSelected(input);
+        ArrayList<Object> inputs = new ArrayList<Object>();
         switch (option) {
             case 'a':
                 System.out.println(
@@ -472,10 +483,17 @@ public class CSE3241app {
             case 'c':
                 System.out.println(
                         "You chose to search for most popular actor in the database");
+                PreparedStatement mostPopAct = CSE3241SQLUtil.setUpPS(conn,
+                        mostPopularActor, inputs);
+                CSE3241SQLUtil.sqlQuerySearchAndPrint(mostPopAct);
+
                 break;
             case 'd':
                 System.out.println(
                         "You chose to search for most listened to artist in the database");
+                PreparedStatement mostPopArt = CSE3241SQLUtil.setUpPS(conn,
+                        mostPopularArtist, inputs);
+                CSE3241SQLUtil.sqlQuerySearchAndPrint(mostPopArt);
                 break;
             case 'e':
                 System.out.println(
