@@ -2,8 +2,7 @@ package osu.cse3241;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 public class CSE3241app {
 
