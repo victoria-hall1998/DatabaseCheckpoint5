@@ -483,7 +483,6 @@ public class CSE3241app {
             case 'c':
                 System.out.println(
                         "You chose to search for most popular actor in the database");
-
                 PreparedStatement mostPopAct = CSE3241SQLUtil.setUpPS(conn,
                         mostPopularActor, inputs);
                 CSE3241SQLUtil.sqlQuerySearchAndPrint(mostPopAct);
