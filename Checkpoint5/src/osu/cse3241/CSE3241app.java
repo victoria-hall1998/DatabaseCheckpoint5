@@ -2,8 +2,7 @@ package osu.cse3241;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 public class CSE3241app {
 
@@ -39,7 +38,7 @@ public class CSE3241app {
             + " WHERE Track_Title LIKE ? AND Track.Work_ID = Album.Work_ID AND Album.Work_ID = Produces.Work_ID AND Produces.Artist_ID = Artist.Artist_ID;";
     private static String sqlInsertIntoArtist = "INSERT INTO Artist(Artist_ID, No_Members, Stage_Name) VALUES (?, ?, ?);";
     private static String sqlInsertIntoAudiobook = "INSERT INTO Audiobook(Work_ID, Lit_Genre, No_Pages, No_Chapters, Title, Rating, Release_Date, Physical_Copies_Available, Physical_Copies_Out, Digital_Copies_Available, Digital_Copies_Out) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-    private static String mostPopularActor = "SELECT max(total), Person.Name, Person.Actor_Flag\r\n"
+    private static String mostPopularActor = "SELECT max(total), Person.Name\r\n"
             + "FROM PERSON, (SELECT count(Rents.Work_ID = Acts_In.Work_ID) as total\r\n"
             + "FROM PERSON, RENTS, ACTS_IN\r\n"
             + "WHERE Rents.Work_ID = ACTS_IN.Work_ID AND ACTS_IN.Personal_ID = Person.Personal_ID AND Rents.Type = \"Movie\")\r\n"
