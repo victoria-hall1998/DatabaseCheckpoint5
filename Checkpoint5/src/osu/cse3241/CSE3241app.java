@@ -2,7 +2,8 @@ package osu.cse3241;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class CSE3241app {
 
@@ -15,7 +16,7 @@ public class CSE3241app {
      * Otherwise, you will need to provide an absolute path from your C: drive
      * or a relative path from the folder this class is in.
      */
-    private static String DATABASE = "";
+    private static String DATABASE = "/home/sidd/Desktop/sqlitestudio-3.3.3/SQLiteStudio/db_check5.db";
     // This line ^^^ will need to be changed. We can put a .db file into the project folder
 
     /**
@@ -48,6 +49,25 @@ public class CSE3241app {
             + "FROM ARTIST, ALBUM, RENTS, PRODUCES\r\n"
             + "WHERE Artist.Artist_ID = Produces.Artist_ID AND Rents.Work_ID = Produces.Work_ID);\r\n"
             + "";
+
+    private static String tracksByArtistBeforeYear = "SELECT Track.Track_Title\r\n"
+            + "FROM Album, Track, Artist, Produces\r\n"
+            + "WHERE Artist.Stage_Name = ?\r\n"
+            + "AND Album.Release_Date < ?\r\n"
+            + "AND Produces.Work_ID = Album.Work_ID\r\n"
+            + "AND Produces.Artist_ID = Artist.Artist_ID\r\n"
+            + "AND Track.Work_ID = Album.Work_ID;";
+
+    private static String numAlbumsRentedByPatron = " SELECT COUNT(Rents.Library_Card)\r\n"
+            + "FROM Rents, Library_Member\r\n"
+            + "WHERE Library_Member.Email = ?" + "AND Rents.Type = 'Album'\r\n"
+            + "AND Rents.Library_Card = Library_Member.Library_Card";
+
+    private static String patronMostVideos = "SELECT COUNT(Rents.Library_Card), Library_Member.*\r\n"
+            + "FROM Rents, Library_Member\r\n"
+            + "WHERE Rents.Library_Card = Library_Member.Library_Card\r\n"
+            + "GROUP BY Rents.Library_Card\r\n"
+            + "ORDER BY COUNT(Rents.Library_Card) DESC\r\n" + "LIMIT 1";
 
     /**
      * Main Menu Options Print
@@ -312,8 +332,8 @@ public class CSE3241app {
 
                 System.out.print("When was/is the Audiobook's Release_Date? ");
                 String releasedateab = input.nextLine();
-                while (!CSE3241IOUtil.checkDateFormat(releasedateab)
-                        && !releasedateab.isBlank()) {
+                while (!CSE3241IOUtil.checkDateFormat(releasedateab,
+                        "MM/dd/yyyy") && !releasedateab.isBlank()) {
                     System.out.println("You entered an invalid release date.");
                     System.out.println(
                             "What is the Rating of the Audiobook (enter in mm/dd/year format)? ");
@@ -469,17 +489,35 @@ public class CSE3241app {
         System.out.println("d. Most listened to artist in the database");
         System.out.println("e. Patron who has checked out the most videos");
         System.out.println("Any other entry will exit the program");
+
         char option = optionSelected(input);
         ArrayList<Object> inputs = new ArrayList<Object>();
         switch (option) {
             case 'a':
                 System.out.println(
                         "You chose to search for tracks by artist released before year");
+                System.out.print("Enter the artist: ");
+                inputs.add(input.nextLine());
+                System.out.print("Enter the year: ");
+                String yearStr = input.nextLine();
+                java.sql.Date sqlYear = CSE3241SQLUtil.strToDate("yyyy",
+                        yearStr);
+                inputs.add(sqlYear);
+                PreparedStatement tracksByArtBefYear = CSE3241SQLUtil
+                        .setUpPS(conn, tracksByArtistBeforeYear, inputs);
+                CSE3241SQLUtil.sqlQuerySearchAndPrint(tracksByArtBefYear);
                 break;
+
             case 'b':
                 System.out.println(
-                        "You chose to search for number of albums checked out by a single patrong");
+                        "You chose to search for number of albums checked out by a single patron");
+                System.out.print("Enter the email address of the patron: ");
+                inputs.add(input.nextLine());
+                PreparedStatement albumRentalsByPatron = CSE3241SQLUtil
+                        .setUpPS(conn, numAlbumsRentedByPatron, inputs);
+                CSE3241SQLUtil.sqlQuerySearchAndPrint(albumRentalsByPatron);
                 break;
+
             case 'c':
                 System.out.println(
                         "You chose to search for most popular actor in the database");
@@ -488,6 +526,7 @@ public class CSE3241app {
                 CSE3241SQLUtil.sqlQuerySearchAndPrint(mostPopAct);
 
                 break;
+
             case 'd':
                 System.out.println(
                         "You chose to search for most listened to artist in the database");
@@ -495,10 +534,15 @@ public class CSE3241app {
                         mostPopularArtist, inputs);
                 CSE3241SQLUtil.sqlQuerySearchAndPrint(mostPopArt);
                 break;
+
             case 'e':
                 System.out.println(
                         "You chose to search for the person who has checked out the most videos");
+                PreparedStatement patMostVid = CSE3241SQLUtil.setUpPS(conn,
+                        patronMostVideos, inputs);
+                CSE3241SQLUtil.sqlQuerySearchAndPrint(patMostVid);
                 break;
+
             default:
                 System.out.println("Invalid choice. Process restarting. ");
                 break;
@@ -509,7 +553,7 @@ public class CSE3241app {
         // Set up the database
         //System.out.println("This is a new run");
         Connection conn = CSE3241SQLUtil.initializeDB(DATABASE);
-
+        System.out.println(conn);
         // While the user still wants to do something, continue showing the main menu
         boolean exitFlag = false;
         Scanner input = new Scanner(System.in);
