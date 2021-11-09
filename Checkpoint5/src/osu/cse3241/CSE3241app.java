@@ -16,7 +16,7 @@ public class CSE3241app {
      * Otherwise, you will need to provide an absolute path from your C: drive
      * or a relative path from the folder this class is in.
      */
-    private static String DATABASE = "/home/sidd/Desktop/sqlitestudio-3.3.3/SQLiteStudio/db_check5.db";
+    private static String DATABASE = "";
     // This line ^^^ will need to be changed. We can put a .db file into the project folder
 
     /**
