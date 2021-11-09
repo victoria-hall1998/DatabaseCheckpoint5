@@ -80,7 +80,7 @@ public class CSE3241app {
         System.out.println("b. Add new records");
         System.out.println("c. Order items");
         System.out.println("d. Edit records");
-        System.out.println("e. Useful Reports (not implemented yet)");
+        System.out.println("e. Useful Reports");
         System.out.println("Any other letter will Exit the program");
     }
 
@@ -497,7 +497,14 @@ public class CSE3241app {
                 System.out.println(
                         "You chose to search for tracks by artist released before year");
                 System.out.print("Enter the artist: ");
-                inputs.add(input.nextLine());
+                String artist = input.nextLine();
+                while (CSE3241IOUtil.checkLength(artist, 30) || artist.isBlank()) {
+		    		System.out.println("You entered an invalid Stage_Name.");
+		    		System.out.print("What is their Stage_Name (Please use abbreviation if longer than 30 characters)? ");
+		    		artist = input.nextLine();
+		    	}
+                inputs.add(artist);
+                
                 System.out.print("Enter the year: ");
                 String yearStr = input.nextLine();
                 java.sql.Date sqlYear = CSE3241SQLUtil.strToDate("yyyy",
@@ -512,7 +519,13 @@ public class CSE3241app {
                 System.out.println(
                         "You chose to search for number of albums checked out by a single patron");
                 System.out.print("Enter the email address of the patron: ");
-                inputs.add(input.nextLine());
+                String email = input.nextLine();
+                while (CSE3241IOUtil.checkLength(email, 40) || email.isBlank()) {
+		    		System.out.println("You entered an invalid Stage_Name.");
+		    		System.out.print("What is their Stage_Name (Please use abbreviation if longer than 30 characters)? ");
+		    		email = input.nextLine();
+		    	}
+                inputs.add(email);
                 PreparedStatement albumRentalsByPatron = CSE3241SQLUtil
                         .setUpPS(conn, numAlbumsRentedByPatron, inputs);
                 CSE3241SQLUtil.sqlQuerySearchAndPrint(albumRentalsByPatron);
