@@ -402,19 +402,20 @@ public class CSE3241app {
             	String d1 = input.nextLine();
             	while (!CSE3241IOUtil.checkDateFormat(d1)
                         && !d1.isBlank()) {
-                    System.out.println("You entered an invalid release date.");
-                    System.out.println(
-                            "What is the Rating of the Audiobook (enter in mm/dd/year format)? ");
+                    System.out.println("You entered an invalid delivery date.");
                     d1 = input.nextLine();
                 }
             	System.out.println("How many copies of the movie did you order? ");
             	String quantityDesired ="";
             	quantityDesired = input.nextLine();
+            	ArrayList<Object> choiceA = new ArrayList<>();
+            	choiceA.add(empID);
+            	choiceA.add(workID);
+            	choiceA.add(d1);
+            	choiceA.add(quantityDesired);            	
+            	String sqlQuery = "INSERT INTO ORDERS(Employee_ID, Work_ID, Est_Delivery_Date, Quantity, Type) VALUES(?, ?, ?, ?,'Movie');";
             	
-            	String sqlQuery = "INSERT INTO ORDERS(Employee_ID, Work_ID, Est_Delivery_Date, Quantity, Type) VALUES('" + empID +"', '" 
-            			+ workID +"', '" + d1 + "', '" + quantityDesired + "', 'Movie');";
-            	
-            	PreparedStatement ps1 = CSE3241SQLUtil.setUpPS(conn, sqlQuery, new ArrayList<Object>());
+            	PreparedStatement ps1 = CSE3241SQLUtil.setUpPS(conn, sqlQuery, choiceA);
             	CSE3241SQLUtil.sqlQuery(ps1, false);
             	
                 break;
@@ -426,9 +427,10 @@ public class CSE3241app {
                     System.out.println("Error, artistID must be 15 numbers long.");
                     workID = input.nextLine();
                 }
-                
-                String sqlQuery5 = "SELECT * FROM ORDERS WHERE ORDERS.Work_ID = " + workID + ";";
-                PreparedStatement activate = CSE3241SQLUtil.setUpPS(conn, sqlQuery5, new ArrayList<Object>());
+                ArrayList<Object> starter = new ArrayList<>();
+                starter.add(workID);
+                String sqlQuery5 = "SELECT * FROM ORDERS WHERE ORDERS.Work_ID = ?;";
+                PreparedStatement activate = CSE3241SQLUtil.setUpPS(conn, sqlQuery5, starter);
                 System.out.println("Set Up PS worked");
                 ResultSet results = CSE3241SQLUtil.sqlQuery(activate, true);
                 
@@ -453,7 +455,7 @@ public class CSE3241app {
                 	System.out.println("Searching for movie");
                 	ArrayList<Object> movieIn = new ArrayList<Object>();
                 	movieIn.add(workID);
-                	String movieSearch = "SELECT * FROM MOVIE WHERE MOVIE.Work_ID = " + workID + ";";
+                	String movieSearch = "SELECT * FROM MOVIE WHERE MOVIE.Work_ID = ?;";
                 	PreparedStatement ps2 = CSE3241SQLUtil.setUpPS(conn, movieSearch, movieIn);
                 	ResultSet movie = CSE3241SQLUtil.sqlQuery(ps2, true);
                 	String value2 = "";
@@ -479,7 +481,7 @@ public class CSE3241app {
 				                        && !rating.isBlank()) {
 				                    System.out.println("You entered an invalid rating.");
 				                    System.out.println(
-				                            "What is the Rating of the Audiobook (enter in #.# or ##.# format between 0.0 and 10.0)? ");
+				                            "What is the Rating of the movie (enter in #.# or ##.# format between 0.0 and 10.0)? ");
 				                    System.out.print(
 				                            "Note: if value has more than one value after the . they will be dropped. ");
 				                    rating = input.nextLine();
@@ -490,22 +492,35 @@ public class CSE3241app {
 			                        && !release.isBlank()) {
 			                    System.out.println("You entered an invalid release date.");
 			                    System.out.println(
-			                            "What is the Rating of the Audiobook (enter in mm/dd/year format)? ");
+			                            "What is the release date of the movie (enter in mm/dd/year format)? ");
 			                    release = input.nextLine();
 			                }
+							
+							movieIn.add(genre);
+							movieIn.add(time);
+							
+							movieIn.add(title);
+							movieIn.add(rating);
+							movieIn.add(release);
+							movieIn.add(quantity);
+							movieIn.add(quantity);
+							
+							
 							String sqlQuery3 = "INSERT INTO MOVIE(Work_ID, Film_Genre, Duration, Title, Rating, Release_Date, "
 									+ "Physical_Copies_Available, Physical_Copies_Out, Digital_Copies_Available, Digital_Copies_Out) "
-									+ "VALUES('" + workID + "', '" + genre + "', '" + time + "', '" + title + "', '" + rating +"', '" + release
-									+ "', '" + quantity + "', '0', '" + quantity + "', '0);";
-							PreparedStatement ps3 = CSE3241SQLUtil.setUpPS(conn, sqlQuery3, new ArrayList<Object>());
+									+ "VALUES(?, ?, ?, ?, ?, ?, ?, '0', ?, '0');";
+							PreparedStatement ps3 = CSE3241SQLUtil.setUpPS(conn, sqlQuery3, movieIn);
 							CSE3241SQLUtil.sqlQuery(ps3, false);
 							System.out.println("Insert into MOVIE table successful");
 						}else {
 							int val = 0;
 							val = movie.getInt("Digital_Copies_Available");
 							int totalValue = val + quantity;
-							String updateMovie = "UPDATE MOVIE SET Physical_Copies_Available = '" + totalValue + "' WHERE Work_ID =" + workID + ";"; 
-							PreparedStatement updated = CSE3241SQLUtil.setUpPS(conn, updateMovie, new ArrayList<Object>());
+							ArrayList<Object> toUpdate3 = new ArrayList<Object>();
+							toUpdate3.add(totalValue);
+							toUpdate3.add(workID);
+							String updateMovie = "UPDATE MOVIE SET Physical_Copies_Available = ? WHERE Work_ID = ?;"; 
+							PreparedStatement updated = CSE3241SQLUtil.setUpPS(conn, updateMovie, toUpdate3);
 							CSE3241SQLUtil.sqlQuery(updated, false);
 							System.out.println("Update successful");
 						}
@@ -517,8 +532,8 @@ public class CSE3241app {
                 case "album":
                 	ArrayList<Object> albumIn = new ArrayList<Object>();
                 	albumIn.add(workID);
-                	String albumSearch = "SELECT * FROM ALBUM WHERE ALBUM.Work_ID = " + workID + ";";
-                	PreparedStatement albumPS = CSE3241SQLUtil.setUpPS(conn, albumSearch, new ArrayList<Object>());
+                	String albumSearch = "SELECT * FROM ALBUM WHERE ALBUM.Work_ID = ?;";
+                	PreparedStatement albumPS = CSE3241SQLUtil.setUpPS(conn, albumSearch, albumIn);
                 	ResultSet album = CSE3241SQLUtil.sqlQuery(albumPS, true);
                 	String value = "";
 					try {
@@ -539,27 +554,21 @@ public class CSE3241app {
 							String genre = input.nextLine();
 							System.out.println("Enter a duration in HH:MM:SS: ");
 							String time = input.nextLine();
-							System.out.println("Time = " + time);
+							
 							System.out.println("Enter a rating for the album: ");
 							String rating = input.nextLine();
 							 while (!CSE3241IOUtil.checkDoubleFormatting(rating)
 				                        && !rating.isBlank()) {
 				                    System.out.println("You entered an invalid rating.");
 				                    System.out.println(
-				                            "What is the Rating of the Audiobook (enter in #.# or ##.# format between 0.0 and 10.0)? ");
+				                            "What is the Rating of the album (enter in #.# or ##.# format between 0.0 and 10.0)? ");
 				                    System.out.print(
 				                            "Note: if value has more than one value after the . they will be dropped. ");
 				                    rating = input.nextLine();
 				                }
-							System.out.println("Enter a release date in MM/DD/YYYY");
+							System.out.println("Enter a release date in YYYY");
 							String release = input.nextLine();
-							while (!CSE3241IOUtil.checkDateFormat(release)
-			                        && !release.isBlank()) {
-			                    System.out.println("You entered an invalid release date.");
-			                    System.out.println(
-			                            "What is the Rating of the Audiobook (enter in mm/dd/year format)? ");
-			                    release = input.nextLine();
-			                }
+							
 							albumIn.add(genre);
 							albumIn.add(time);
 							albumIn.add(songCount);
@@ -567,20 +576,22 @@ public class CSE3241app {
 							albumIn.add(rating);
 							albumIn.add(release);
 							albumIn.add(quantity);
+							albumIn.add(quantity);
 							
 							String sqlQuery2 = "INSERT INTO ALBUM(Work_ID, Music_Genre, Play_Time, No_Songs, Title, Rating, Release_Date, "
-									+ "Physical_Copies_Available, Physical_Copies_Out, Digital_Copies_Available, Digital_Copies_Out) "
-									+ "VALUES('" + workID + "', '" + genre + "', '" + time + "', '" + songCount + "', '" + title + "', '" + rating +"', '" + release
-									+ "', '" + quantity + "', '0', '" + quantity + "', '0');";
-							PreparedStatement albumPS2 = CSE3241SQLUtil.setUpPS(conn, sqlQuery2, new ArrayList<Object>());
+									+ "Physical_Copies_Available, Physical_Copies_Out, Digital_Copies_Available, Digital_Copies_Out) VALUES(?, ?, ?, ?, ?, ?, ?, ?, '0', ?, '0');";
+							PreparedStatement albumPS2 = CSE3241SQLUtil.setUpPS(conn, sqlQuery2, albumIn);
 							CSE3241SQLUtil.sqlQuery(albumPS2, false);
 							System.out.println("Insert into ALBUM table successful");
 						}else {
 							int val = 0;
 							val = album.getInt("Digital_Copies_Available");
 							int totalValue = val + quantity;
-							String updateAlbum = "UPDATE ALBUM SET Physical_Copies_Available = '" + totalValue + "' WHERE Work_ID =" + workID + ";"; 
-							PreparedStatement updated = CSE3241SQLUtil.setUpPS(conn, updateAlbum, new ArrayList<Object>());
+							ArrayList<Object> toUpdate2 = new ArrayList<Object>();
+							toUpdate2.add(totalValue);
+							toUpdate2.add(workID);
+							String updateAlbum = "UPDATE ALBUM SET Physical_Copies_Available = ? WHERE Work_ID = ?;"; 
+							PreparedStatement updated = CSE3241SQLUtil.setUpPS(conn, updateAlbum, toUpdate2);
 							CSE3241SQLUtil.sqlQuery(updated, false);
 							System.out.println("Update successful");
 						}
@@ -589,10 +600,12 @@ public class CSE3241app {
 					}
                 	break;
                 case "audiobook":
+                	ArrayList<Object> audioIn = new ArrayList<Object>();
                 	String audioSearch = "SELECT * FROM AUDIOBOOK WHERE AUDIOBOOK.Work_ID = " + workID + ";";
                 	PreparedStatement audio2 = CSE3241SQLUtil.setUpPS(conn, audioSearch, new ArrayList<Object>());
                 	ResultSet audio = CSE3241SQLUtil.sqlQuery(audio2, true);
                 	String value3 = "";
+                	audioIn.add(workID);
 					try {
 						if(!audio.isClosed()) {
 							value3 = audio.getString("Work_ID");
@@ -624,19 +637,30 @@ public class CSE3241app {
 				                }
 							System.out.println("Enter a release date in MM/DD/YYYY");
 							String release = input.nextLine();
+							audioIn.add(genre);
+							audioIn.add(pages);
+							audioIn.add(chapters);
+							audioIn.add(title);
+							audioIn.add(rating);
+							audioIn.add(release);
+							audioIn.add(quantity);
+							audioIn.add(quantity);
 							String sqlQuery3 = "INSERT INTO AUDIOBOOK(Work_ID, Lit_Genre, No_Pages, No_Chapters, Title, Rating, Release_Date, "
 									+ "Physical_Copies_Available, Physical_Copies_Out, Digital_Copies_Available, Digital_Copies_Out) "
-									+ "VALUES('" + workID + "', '" + genre + "', '" + pages + "', '" + chapters + "', '" + title + "', '" + rating +"', '" + release
-									+ "', '" + quantity + "', '0', '" + quantity + "', '0');";
-							PreparedStatement ps = CSE3241SQLUtil.setUpPS(conn, sqlQuery3, new ArrayList<Object>());
+									+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, '0', ?, '0');";
+							PreparedStatement ps = CSE3241SQLUtil.setUpPS(conn, sqlQuery3, audioIn);
 							CSE3241SQLUtil.sqlQuery(ps, false);
 							System.out.println("Insert into AUDIOBOOK table successful");
 						}else {
+							
 							int val = 0;
 							val = audio.getInt("Digital_Copies_Available");
 							int totalValue = val + quantity;
-							String updateAudioBook = "UPDATE AUDIOBOOK SET Physical_Copies_Available = '" + totalValue + "' WHERE Work_ID =" + workID + ";"; 
-							PreparedStatement updated = CSE3241SQLUtil.setUpPS(conn, updateAudioBook, new ArrayList<Object>());
+							ArrayList<Object> toUpdate = new ArrayList<Object>();
+							toUpdate.add(totalValue);
+							toUpdate.add(workID);
+							String updateAudioBook = "UPDATE AUDIOBOOK SET Physical_Copies_Available = ? WHERE Work_ID = ?;"; 
+							PreparedStatement updated = CSE3241SQLUtil.setUpPS(conn, updateAudioBook, toUpdate);
 							CSE3241SQLUtil.sqlQuery(updated, false);
 							System.out.println("Update successful");
 						}
