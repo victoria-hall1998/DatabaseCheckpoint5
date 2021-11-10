@@ -167,4 +167,25 @@ public final class CSE3241SQLUtil {
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());
         return sqlDate;
     }
+
+    /**
+     * Sets date of prepared statement
+     *
+     * @param ps
+     *            the prepared statement
+     * @param date
+     *            the sql date object
+     * @param index
+     *            index in ps to insert at
+     * 
+     * @updates ps
+     */
+    public static void setDate(PreparedStatement ps, java.sql.Date date,
+            int index) {
+        try {
+            ps.setDate(index, date);
+        } catch (SQLException e) {
+            CSE3241IOUtil.printThrowable(e);
+        }
+    }
 }

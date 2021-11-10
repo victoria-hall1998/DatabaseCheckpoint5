@@ -16,7 +16,7 @@ public class CSE3241app {
      * Otherwise, you will need to provide an absolute path from your C: drive
      * or a relative path from the folder this class is in.
      */
-    private static String DATABASE = "";
+    private static String DATABASE = "/home/sidd/Desktop/sqlitestudio-3.3.3/SQLiteStudio/db_check5.db";
     // This line ^^^ will need to be changed. We can put a .db file into the project folder
 
     /**
@@ -50,13 +50,14 @@ public class CSE3241app {
             + "WHERE Artist.Artist_ID = Produces.Artist_ID AND Rents.Work_ID = Produces.Work_ID);\r\n"
             + "";
 
-    private static String tracksByArtistBeforeYear = "SELECT Track.Track_Title\r\n"
+    private static String tracksByArtistBeforeYear = "SELECT Track_Title, Release_Date\r\n"
+            + "FROM (" + "SELECT *\r\n"
             + "FROM Album, Track, Artist, Produces\r\n"
             + "WHERE Artist.Stage_Name = ?\r\n"
-            + "AND Album.Release_Date < ?\r\n"
             + "AND Produces.Work_ID = Album.Work_ID\r\n"
             + "AND Produces.Artist_ID = Artist.Artist_ID\r\n"
-            + "AND Track.Work_ID = Album.Work_ID;";
+            + "AND Track.Work_ID = Album.Work_ID)\r\n"
+            + "WHERE Release_Date < ?";
 
     private static String numAlbumsRentedByPatron = " SELECT COUNT(Rents.Library_Card)\r\n"
             + "FROM Rents, Library_Member\r\n"
@@ -497,12 +498,13 @@ public class CSE3241app {
                 System.out.println(
                         "You chose to search for tracks by artist released before year");
                 System.out.print("Enter the artist: ");
-                inputs.add(input.nextLine());
+                String artist = (input.nextLine());
                 System.out.print("Enter the year: ");
-                String yearStr = input.nextLine();
-                java.sql.Date sqlYear = CSE3241SQLUtil.strToDate("yyyy",
-                        yearStr);
+                String year = input.nextLine();
+                java.sql.Date sqlYear = CSE3241SQLUtil.strToDate("yyyy", year);
+                inputs.add(artist);
                 inputs.add(sqlYear);
+                System.out.println(inputs);
                 PreparedStatement tracksByArtBefYear = CSE3241SQLUtil
                         .setUpPS(conn, tracksByArtistBeforeYear, inputs);
                 CSE3241SQLUtil.sqlQuerySearchAndPrint(tracksByArtBefYear);
